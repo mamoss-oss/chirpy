@@ -20,8 +20,6 @@
 # Go workspace file
 go.work
 
-# Exclude exercise solution.
-solution/
 
 # binaries
-out
+chirpy
