@@ -37,6 +37,7 @@ func main() {
 	r.HandleFunc("/reset", conf.resetMetrics)
 
 	r_api.Get("/healthz", healthz)
+	r_api.Post("/validate_chirp", validate_chirp)
 
 	r_admin.Get("/metrics", conf.displayMetrics)
 
