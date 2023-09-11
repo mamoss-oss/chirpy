@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -37,7 +39,7 @@ func main() {
 	r.HandleFunc("/reset", conf.resetMetrics)
 
 	r_api.Get("/healthz", healthz)
-	r_api.Post("/validate_chirp", validate_chirp)
+	//r_api.Post("/validate_chirp", validate_chirp)
 
 	r_admin.Get("/metrics", conf.displayMetrics)
 
@@ -58,4 +60,28 @@ func main() {
 		log.Fatal(err)
 	}
 
+}
+
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	dat, err := json.Marshal(payload)
+	if err != nil {
+		log.Printf("Error marshalling JSON: %s", err)
+		w.WriteHeader(500)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(dat)
+}
+
+func respondWithError(w http.ResponseWriter, code int, msg string) {
+	if code >= 500 {
+		fmt.Printf("Server side error: %d", code)
+	}
+	type err_resp struct {
+		Err_msg string `json:"error"`
+	}
+	respondWithJSON(w, code, err_resp{
+		Err_msg: msg,
+	})
 }

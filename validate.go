@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"slices"
@@ -51,30 +50,6 @@ func validate_chirp(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, 400, msg)
 	}
 
-}
-
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	dat, err := json.Marshal(payload)
-	if err != nil {
-		log.Printf("Error marshalling JSON: %s", err)
-		w.WriteHeader(500)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(dat)
-}
-
-func respondWithError(w http.ResponseWriter, code int, msg string) {
-	if code >= 500 {
-		fmt.Printf("Server side error: %d", code)
-	}
-	type err_resp struct {
-		Err_msg string `json:"error"`
-	}
-	respondWithJSON(w, code, err_resp{
-		Err_msg: msg,
-	})
 }
 
 func Sanitize(s string, words []string) string {

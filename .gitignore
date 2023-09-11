@@ -23,3 +23,6 @@ go.work
 
 # binaries
 chirpy
+
+# local database replacement in the form of a json file.
+database.json
