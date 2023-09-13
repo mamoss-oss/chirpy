@@ -1,4 +1,4 @@
-package internal
+package db
 
 import (
 	"encoding/json"
@@ -15,12 +15,21 @@ type DB struct {
 
 type DBStructure struct {
 	Chirps map[int]Chirp `json:"chirps"`
+	Users  map[int]User  `json:"users"`
 }
 
 type Chirp struct {
 	ID   int    `json:"id"`
 	Body string `json:"body"`
 }
+
+type User struct {
+	ID       int    `json:"id"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func UNUSED(x ...interface{}) {}
 
 // NewDB creates a new database connection
 // and creates the database file if it doesn't exist
@@ -52,7 +61,7 @@ func (db *DB) ensureDB() error {
 	if err != nil {
 		return err
 	}
-	err = db.writeDB(DBStructure{})
+	err = db.writeDB(DBStructure{map[int]Chirp{}, map[int]User{}}) // syntax to initialize the db, otherwise it is nil
 	if err != nil {
 		return err
 	}
@@ -75,8 +84,8 @@ func (db *DB) writeDB(dbStructure DBStructure) error {
 	return nil
 }
 
-// loadDB reads the database file into memory
-func (db *DB) loadDB() (DBStructure, error) {
+// LoadDB reads the database file into memory
+func (db *DB) LoadDB() (DBStructure, error) {
 	db.mux.Lock()
 	defer db.mux.Unlock()
 	data, err := os.ReadFile(db.path)
@@ -92,21 +101,5 @@ func (db *DB) loadDB() (DBStructure, error) {
 		return DBStructure{}, err
 	}
 	return dbStructure, nil
-
-}
-
-// GetChirps returns all chirps in the database
-func (db *DB) GetChirps() ([]Chirp, error) {
-	dbStructure, err := db.loadDB()
-	if err != nil {
-		return []Chirp{}, err
-	}
-	chirps := []Chirp{}
-
-	if dbStructure.Chirps == nil {
-		return chirps, err
-	}
-
-	// todo after writing the add chirp function
 
 }

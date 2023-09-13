@@ -20,6 +20,12 @@ func main() {
 	// admin namespace router
 	r_admin := chi.NewRouter()
 
+	// mount api and admin router mux behind main router r
+	r.Mount("/api/", r_api)
+	r.Mount("/admin/", r_admin)
+	// add middleware to mux
+	corsRouter := middlewareCors(r)
+
 	// create fileserve http handler at root /
 	fs := http.FileServer(http.Dir("./"))
 
@@ -39,15 +45,12 @@ func main() {
 	r.HandleFunc("/reset", conf.resetMetrics)
 
 	r_api.Get("/healthz", healthz)
-	//r_api.Post("/validate_chirp", validate_chirp)
+	r_api.Get("/chirps", API_GetChirps)
+	r_api.Post("/chirps", API_PostChirp)
+	r_api.Get("/chirps/{id}", API_Get_Single_Chirp)
+	r_api.Post("/users", API_Create_User)
 
 	r_admin.Get("/metrics", conf.displayMetrics)
-
-	// mount api and admin router mux behind main router r
-	r.Mount("/api/", r_api)
-	r.Mount("/admin/", r_admin)
-	// add middleware to mux
-	corsRouter := middlewareCors(r)
 
 	serv := &http.Server{
 		Handler: corsRouter,
