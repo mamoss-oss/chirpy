@@ -26,3 +26,6 @@ chirpy
 
 # local database replacement in the form of a json file.
 database.json
+
+# env file containing secrets
+.env

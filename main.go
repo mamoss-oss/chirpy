@@ -49,6 +49,7 @@ func main() {
 	r_api.Post("/chirps", API_PostChirp)
 	r_api.Get("/chirps/{id}", API_Get_Single_Chirp)
 	r_api.Post("/users", API_Create_User)
+	r_api.Post("/login", API_User_Login)
 
 	r_admin.Get("/metrics", conf.displayMetrics)
 

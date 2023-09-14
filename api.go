@@ -94,3 +94,42 @@ func API_Create_User(w http.ResponseWriter, r *http.Request) {
 	}
 	respondWithJSON(w, 201, user_no_pass)
 }
+
+func API_User_Login(w http.ResponseWriter, r *http.Request) {
+	database, err := db.NewDB("./database.json")
+	if err != nil {
+		respondWithError(w, 400, err.Error())
+		return
+	}
+	database_loaded, err := database.LoadDB()
+	if err != nil {
+		respondWithError(w, 400, err.Error())
+		return
+	}
+	email, password, err := helpers.Get_email_password(r)
+	if err != nil {
+		respondWithError(w, 400, err.Error())
+		return
+	}
+	user, err := db.FindByMail(&database_loaded, email)
+	if err != nil {
+		respondWithError(w, 400, err.Error())
+		return
+	}
+	password_ok := db.ComparePasswords(user.Password, password)
+	if password_ok {
+		user_no_pass := struct {
+			ID    int    `json:"id"`
+			Email string `json:"email"`
+		}{
+			ID:    user.ID,
+			Email: user.Email,
+		}
+		respondWithJSON(w, 200, user_no_pass)
+		return
+	} else {
+		respondWithError(w, 401, "Unauthorized")
+		return
+	}
+
+}
